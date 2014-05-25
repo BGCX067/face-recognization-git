@@ -13,7 +13,15 @@ public class MathUtils {
 		return ret;
 	}
 
-	public static double dist(double[] a, double[] b) {
+	public static double[] normalize1(double[] ipt) {
+		double[] ret = new double[ipt.length];
+		for (int i = 0; i < ipt.length; i++) {
+			ret[i] = ipt[i] / ipt[4];
+		}
+		return ret;
+	}
+
+	public static double dist0(double[] a, double[] b) {
 		double sum = 0;
 		for (int i = 0; i < a.length; i++) {
 			sum += Math.pow(a[i] - b[i], 2);
@@ -21,7 +29,7 @@ public class MathUtils {
 		return sum;
 	}
 
-	public static double dist2(double[] a, double[] b) {
+	public static double dist1(double[] a, double[] b) {
 		double sum = 0;
 		double[] c = new double[a.length];
 		for (int i = 0; i < a.length; i++) {
@@ -41,6 +49,18 @@ public class MathUtils {
 		for (int i = 0; i < v.length; i++) {
 			ret[i] = Gaussian3x3[i] * v[i];
 		}
+		return ret;
+	}
+
+	public static double dist2(double[] a, double[] b) {
+		return dist0(ssum(a), ssum(b));
+	}
+
+	private static double[] ssum(double[] v) {
+		double[] ret = new double[3];
+		ret[0] = v[4] * 2;
+		ret[1] = (v[2] + v[4] + v[6] + v[8]) / 4.0 * Math.sqrt(2);
+		ret[2] = (v[1] + v[3] + v[5] + v[7]) / 4.0;
 		return ret;
 	}
 }

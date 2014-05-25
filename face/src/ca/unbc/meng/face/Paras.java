@@ -7,17 +7,15 @@ public class Paras {
 	public int PIXCEL_SIZE = 3;
 	public int SHIFT = 4;
 	public List<Double> angle = new LinkedList<>();
-	public boolean rotate = false;
 	public int train = 2;
 	public int test = 10;
-	public int threadNum = 8;
-	
-	public int distType = 0;
+	public int threadNum = Runtime.getRuntime().availableProcessors();
+
+	public int normrType = 1;
+	public int distType = 1;
 
 	public Paras() {
-		angle.add(Math.PI / 60);
-		angle.add(Math.PI / 30);
+//		angle.add(0.05);
 	}
-	
-	
+
 }

@@ -24,7 +24,7 @@ public class AnalyzeThread extends Thread {
 			for (int x = 0; x < loopSize; x++) {
 				for (int y = 0; y < loopSize; y++) {
 					double[] testm = dataStrore.getTestPixcel(idTest, x, y);
-					double[] ntestm = MathUtils.normalize(testm);
+					double[] ntestm = normr(testm);
 					List<Integer> ids = findMinDistImg(x, y, ntestm);
 					for (Integer id : ids) {
 						int label = dataStrore.getLabel(id);
@@ -64,12 +64,18 @@ public class AnalyzeThread extends Thread {
 		LinkedList<Integer> ret = new LinkedList<>();
 		for (int idTrain : dataStrore.getTrainIdx()) {
 			for (double[] trainm : dataStrore.getTrainPixcels(idTrain, x, y)) {
-				double[] ntrainm = MathUtils.normalize(trainm);
+				double[] ntrainm = normr(trainm);
 				double dist;
-				if (dataStrore.paras.distType == 0)
-					dist = MathUtils.dist(ntrainm, ntestm);
-				else
+				switch (dataStrore.paras.distType) {
+				case 0:
+					dist = MathUtils.dist0(ntrainm, ntestm);
+				case 1:
+					dist = MathUtils.dist1(ntrainm, ntestm);
+				case 2:
 					dist = MathUtils.dist2(ntrainm, ntestm);
+				default:
+					dist = MathUtils.dist0(ntrainm, ntestm);
+				}
 				if (minDist == dist) {
 					ret.add(idTrain);
 				} else if (dist < minDist) {
@@ -80,5 +86,16 @@ public class AnalyzeThread extends Thread {
 			}
 		}
 		return ret;
+	}
+
+	private double[] normr(double[] trainm) {
+		switch (dataStrore.paras.normrType) {
+		case 0:
+			return MathUtils.normalize(trainm);
+		case 1:
+			return MathUtils.normalize1(trainm);
+		default:
+			return MathUtils.normalize(trainm);
+		}
 	}
 }

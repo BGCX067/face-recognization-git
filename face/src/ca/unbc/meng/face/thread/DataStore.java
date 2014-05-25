@@ -35,8 +35,8 @@ public class DataStore {
 		loadIdx();
 		IMG_WIDTH = (int) Math.sqrt(imgData[0].length);
 	}
-	
-	public void reloadNewTest() throws FileNotFoundException, IOException{
+
+	public void reloadNewTest() throws FileNotFoundException, IOException {
 		loadIdx();
 	}
 
@@ -97,7 +97,7 @@ public class DataStore {
 	public int[] getTrainIdx() {
 		return trainIdx;
 	}
-	
+
 	public int[] getImage(int id) {
 		return imgData[id];
 	}
@@ -140,8 +140,6 @@ public class DataStore {
 					continue;
 				else
 					ret.add(ur);
-				if (!paras.rotate)
-					continue;
 				// rotate
 				String key = idTrain + "," + nx + "," + ny;
 				if (rotateStore.containsKey(key))
@@ -164,10 +162,10 @@ public class DataStore {
 		if (y - 1 < 0 || y + paras.PIXCEL_SIZE + 2 >= IMG_WIDTH)
 			return ret;
 		double[] origPixcel = getMacropixcel(in_img, x - 1, y - 1,
-				paras.PIXCEL_SIZE + 2);
+				paras.PIXCEL_SIZE);
 		for (double a : paras.angle) {
 			ret.add(rotate(origPixcel, a));
-			ret.add(rotate(origPixcel, -a));
+			ret.add(rotateRevise(origPixcel, -a));
 		}
 		return ret;
 	}
@@ -187,43 +185,33 @@ public class DataStore {
 	}
 
 	private double[] rotate(double in_img[], double angle) {
-		int nrows = paras.PIXCEL_SIZE + 2;
 		double[] out_img = new double[paras.PIXCEL_SIZE * paras.PIXCEL_SIZE];
-		double center = (nrows - 1) / 2.0;
-		double cs = Math.cos(angle);
-		double sn = Math.sin(angle);
+		out_img[4] = in_img[4];
+		int[] idx1 = { 1, 3, 5, 7 };
+		int[] idx2 = { 0, 2, 6, 8 };
+		for (int i = 0; i <= idx1.length; i++) {
+			out_img[i] = in_img[i] * (1 - angle)
+					+ in_img[(i + 1) % idx1.length] * angle;
+		}
+		for (int i = 0; i <= idx2.length; i++) {
+			out_img[i] = in_img[i] * (1 - angle)
+					+ in_img[(i + 1) % idx2.length] * angle;
+		}
+		return out_img;
+	}
 
-		for (int i = 1; i < nrows - 1; i++) {
-			for (int j = 1; j < nrows - 1; j++) {
-				double x = (i - center) * cs - (j - center) * sn + center;
-				double y = (i - center) * sn + (j - center) * cs + center;
-				int pos = (i - 1) * paras.PIXCEL_SIZE + j - 1;
-
-				// Outside the original image
-				if (x < 0 || x >= nrows - 1) {
-					out_img[pos] = 0;
-					continue;
-				}
-				if (y < 0 || y >= nrows - 1) {
-					out_img[pos] = 0;
-					continue;
-				}
-
-				// Bilinear interpolation
-				int x0 = (int) Math.floor(x);
-				int y0 = (int) Math.floor(y);
-				int x1 = x0 + 1;
-				int y1 = y0 + 1;
-
-				double p0 = in_img[x0 * nrows + y0];
-				double p1 = in_img[x1 * nrows + y0];
-				double p = (x1 - x) * p0 + (x - x0) * p1;
-
-				double p2 = in_img[x0 * nrows + y1];
-				double p3 = in_img[x1 * nrows + y1];
-				double q = (x1 - x) * p2 + (x - x0) * p3;
-				out_img[pos] = (y1 - y) * p + (y - y0) * q;
-			}
+	private double[] rotateRevise(double in_img[], double angle) {
+		double[] out_img = new double[paras.PIXCEL_SIZE * paras.PIXCEL_SIZE];
+		out_img[4] = in_img[4];
+		int[] idx1 = { 1, 3, 5, 7 };
+		int[] idx2 = { 0, 2, 6, 8 };
+		for (int i = 0; i <= idx1.length; i++) {
+			out_img[i] = in_img[i] * (1 - angle)
+					+ in_img[(i + 3) % idx1.length] * angle;
+		}
+		for (int i = 0; i <= idx2.length; i++) {
+			out_img[i] = in_img[i] * (1 - angle)
+					+ in_img[(i + 3) % idx2.length] * angle;
 		}
 		return out_img;
 	}
