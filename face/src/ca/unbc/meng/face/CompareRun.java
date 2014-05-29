@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
 import ca.unbc.meng.face.thread.DataStore;
 
@@ -17,15 +19,26 @@ public class CompareRun {
 		MutlithreadRecognize mr = new MutlithreadRecognize();
 		LinkedList<int[]> list = new LinkedList<>();
 		int distTypeCnt = 3;
-		for (int i = 4; i <= 10; i++) {
+		for (int i = 11; i <= 15; i++) {
 			paras.test = i;
 			int[] r = new int[distTypeCnt + 1];
 			r[0] = i;
-			for (int j = 0; j < distTypeCnt; j++) {
-				paras.distType = j;
-				ds.reloadNewTest();
-				r[j + 1] = mr.process(ds);
-			}
+			
+			paras.normrType = 0;
+			paras.distType = 0;
+			ds.reloadNewTest();
+			r[1] = mr.process(ds);
+			
+			paras.normrType = 1;
+			paras.distType = 1;
+			ds.reloadNewTest();
+			r[2] = mr.process(ds);
+			
+			paras.normrType = 1;
+			paras.distType = 2;
+			ds.reloadNewTest();
+			r[3] = mr.process(ds);
+			
 			System.out.println(Arrays.toString(r));
 			list.add(r);
 		}
@@ -42,6 +55,15 @@ public class CompareRun {
 					.append("\n");
 			bw.append("shift").append(String.valueOf(paras.SHIFT)).append("\n");
 		}
+		
+		TreeSet<String> rankedList = new TreeSet<>(new Comparator<String>() {
+
+			@Override
+			public int compare(String arg0, String arg1) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+		});
 	}
 
 }
